@@ -1,7 +1,7 @@
 Web Console for Rails 3
 =======================
 
-[![Travis](https://travis-ci.org/gsamokovarov/web-console-rails3.png)](https://travis-ci.org/gsamokovarov/web-console-rails3)
+[![Travis](https://travis-ci.org/gsamokovarov/web-console-rails3.png)](https://travis-ci.org/gsamokovarov/web-console-rails3) [![Version](https://badge.fury.io/rb/web-console-rails3.png)](http://badge.fury.io/rb/web-console-rails3)
 
 [Web Console] is great and all, but by default, it only runs on _Rails 4_. If
 you can't easily upgrade your application to _Rails 4_, you can use this build
