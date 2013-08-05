@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    web-console (0.2.0)
+    web-console-rails3 (0.2.0)
       jquery-rails (~> 3.0.4)
       rails (>= 3.2.0, < 4.0)
       strong_parameters (~> 0.2.0)
@@ -100,4 +100,4 @@ PLATFORMS
 DEPENDENCIES
   rake
   sqlite3
-  web-console!
+  web-console-rails3!
