@@ -1,12 +1,39 @@
 require 'test_helper'
 
 class WebConsoleTest < ActiveSupport::TestCase
-  test 'different default_mount_path' do
+  test 'custom default_mount_path' do
     new_uninitialized_app do |app|
       app.config.web_console.default_mount_path = '/shell'
       app.initialize!
 
       assert app.routes.named_routes['web_console'].path.match('/shell')
+    end
+  end
+
+  test 'disabling automounting' do
+    new_uninitialized_app do |app|
+      app.config.web_console.automount = false
+      app.initialize!
+
+      refute app.routes.named_routes['web_console']
+    end
+  end
+
+  test 'blank commands are expanded to the rails console' do
+    new_uninitialized_app do |app|
+      app.config.web_console.command = ' '
+      app.initialize!
+
+      assert_equal 'rails_console', app.config.web_console.command
+    end
+  end
+
+  test 'present commands are not processed' do
+    new_uninitialized_app do |app|
+      app.config.web_console.command = '/bin/login'
+      app.initialize!
+
+      assert_equal '/bin/login', app.config.web_console.command
     end
   end
 
@@ -74,20 +101,33 @@ class WebConsoleTest < ActiveSupport::TestCase
     def new_uninitialized_app(root = File.expand_path('../dummy', __FILE__))
       skip if Rails::VERSION::MAJOR == 3
 
-      FileUtils.mkdir_p root
-      Dir.chdir root
-
       old_app = Rails.application
-      Rails.application = nil
 
-      app = Class.new(Rails::Application)
-      app.config.eager_load = false
-      app.config.time_zone = 'UTC'
-      app.config.middleware ||= Rails::Configuration::MiddlewareStackProxy.new
-      app.config.active_support.deprecation = :notify
+      FileUtils.mkdir_p(root)
+      Dir.chdir(root) do
+        Rails.application = nil
 
-      yield app
+        app = Class.new(Rails::Application)
+        app.config.eager_load = false
+        app.config.time_zone = 'UTC'
+        app.config.middleware ||= Rails::Configuration::MiddlewareStackProxy.new
+        app.config.active_support.deprecation = :notify
+
+        yield app
+      end
     ensure
       Rails.application = old_app
+    end
+
+    def teardown_fixtures(*)
+      super
+    rescue
+      # This is nasty hack to prevent a connection to the database in JRuby's
+      # activerecord-jdbcsqlite3-adapter. We don't really require a database
+      # connection, for the tests to run.
+      #
+      # The sad thing is that I couldn't figure out why does it only happens on
+      # activerecord-jdbcsqlite3-adapter and how to actually prevent it, rather
+      # than work-around it.
     end
 end

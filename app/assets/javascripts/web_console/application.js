@@ -1,4 +1,2 @@
-//= require jquery
-//= require jquery_ujs
-//= require jquery.console
+//= require web_console
 //= require_tree .

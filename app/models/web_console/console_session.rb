@@ -1,33 +1,35 @@
 module WebConsole
+  # Manage and persist (in memory) WebConsole::Slave instances.
   class ConsoleSession
-    include Mutex_m
-
     include ActiveModel::Model
-    include ActiveModel::Serializers::JSON
 
     # In-memory storage for the console sessions. Session preservation is
     # troubled on servers with multiple workers and threads.
     INMEMORY_STORAGE = {}
 
-    # Store and define the available attributes.
-    ATTRIBUTES = [ :id, :input, :output, :prompt ].each do |attr|
-      attr_accessor attr
+    # Base error class for ConsoleSession specific exceptions.
+    #
+    # Provides #to_json implementation, so all subclasses are JSON
+    # serializable.
+    class Error < StandardError
+      def to_json(*)
+        { error: to_s }.to_json
+      end
     end
 
     # Raised when trying to find a session that is no longer in the in-memory
     # session storage.
-    class NotFound < Exception
-      def to_json(*)
-        {error: message}.to_json
-      end
-    end
+    NotFound = Class.new(Error)
+
+    # Raised when an operation transition to an invalid state.
+    Invalid = Class.new(Error)
 
     class << self
-      # Finds a session by its id.
+      # Finds a session by its pid.
       #
       # Raises WebConsole::ConsoleSession::Expired if there is no such session.
-      def find(id)
-        INMEMORY_STORAGE[id.to_i] or raise NotFound.new('Session unavailable')
+      def find(pid)
+        INMEMORY_STORAGE[pid.to_i] or raise NotFound, 'Session unavailable'
       end
 
       # Creates an already persisted consolse session.
@@ -35,76 +37,44 @@ module WebConsole
       # Use this method if you need to persist a session, without providing it
       # any input.
       def create
-        INMEMORY_STORAGE[(model = new).id] = model
+        new.persist
       end
     end
 
     def initialize(attributes = {})
-      @repl = WebConsole::REPL.default.new
-
-      super
-      ensure_consequential_id!
-      populate_repl_attributes!(initial: true)
+      @slave = WebConsole::Slave.new
     end
 
-    # Saves the model into the in-memory storage.
-    #
-    # Returns false if the model is not valid (e.g. its missing input).
-    def save(attributes = {})
-      self.attributes = attributes if attributes.present?
-      populate_repl_attributes!
-      store!
+    # Explicitly persist the model in the in-memory storage.
+    def persist
+      INMEMORY_STORAGE[pid] = self
     end
 
     # Returns true if the current session is persisted in the in-memory storage.
     def persisted?
-      self == INMEMORY_STORAGE[id]
+      self == INMEMORY_STORAGE[pid]
     end
 
     # Returns an Enumerable of all key attributes if any is set, regardless if
     # the object is persisted or not.
     def to_key
-      super if persisted?
+      [pid] if persisted?
     end
 
-    protected
-      # Returns a hash of the attributes and their values.
-      def attributes
-        return Hash[ATTRIBUTES.zip([nil])]
-      end
-
-      # Sets model attributes from a hash.
-      def attributes=(attributes)
-        attributes.each do |attr, value|
-          next unless ATTRIBUTES.include?(attr.to_sym)
-          public_send(:"#{attr}=", value)
-        end
-      end
-
     private
-      def ensure_consequential_id!
-        synchronize do
-          self.id = begin
-            @@counter ||= 0
-            @@counter  += 1
-          end
+
+      def method_missing(name, *args, &block)
+        if @slave.respond_to?(name)
+          @slave.public_send(name, *args, &block)
+        else
+          super
         end
+      rescue ArgumentError => exc
+        raise Invalid, exc
       end
 
-      def populate_repl_attributes!(options = {})
-        synchronize do
-          # Don't send any input on the initial population so we don't bump up
-          # the numbers in the dynamic prompts.
-          self.output = @repl.send_input(input) unless options[:initial]
-          self.prompt = @repl.prompt
-        end
-      end
-
-      def store!
-        synchronize { INMEMORY_STORAGE[id] = self }
+      def respond_to_missing?(name, include_all = false)
+        @slave.respond_to?(name) or super
       end
   end
-
-  # Explicitly configue include_root_in_json for Rails 3 compatibility.
-  ConsoleSession.include_root_in_json = false
 end
