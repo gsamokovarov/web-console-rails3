@@ -2,6 +2,10 @@ require 'ipaddr'
 require 'active_support/core_ext/numeric/time'
 require 'rails/engine'
 
+# Those are required for Rails 3 compatibility.
+require 'strong_parameters'
+require 'active_model/model'
+
 module WebConsole
   class Engine < ::Rails::Engine
     isolate_namespace WebConsole
