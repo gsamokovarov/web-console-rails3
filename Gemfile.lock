@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    web-console-rails3 (0.3.0)
+    web-console-rails3 (0.4.0)
       rails (>= 3.2.0, < 4.0)
       strong_parameters (~> 0.2.0)
 
@@ -50,10 +50,10 @@ GEM
       treetop (~> 1.4.8)
     metaclass (0.0.1)
     method_source (0.8.2)
-    mime-types (1.24)
+    mime-types (1.25)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
-    multi_json (1.7.9)
+    multi_json (1.8.0)
     polyglot (0.3.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)

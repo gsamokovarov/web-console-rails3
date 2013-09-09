@@ -49,6 +49,19 @@ module Dummy
       # For long-polling 45 seconds timeout seems reasonable.
       config.web_console.timeout = 45.seconds
     end
+
+    config.web_console.style.colors =
+      if ENV['SOLARIZED_LIGHT']
+        'solarized_light'
+      elsif ENV['SOLARIZED_DARK']
+        'solarized_dark'
+      elsif ENV['TANGO']
+        'tango'
+      elsif ENV['XTERM']
+        'xterm'
+      else
+        'light'
+      end
   end
 end
 
