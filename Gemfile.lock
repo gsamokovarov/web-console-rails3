@@ -115,6 +115,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-jdbcsqlite3-adapter
+  activerecord-sqlite3-adapter
   mocha
   pry-rails
   puma

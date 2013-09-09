@@ -9,6 +9,7 @@ group :development do
   gem 'pry-rails', require: false
 
   platforms :jruby do
+    gem 'activerecord-sqlite3-adapter'
     gem 'activerecord-jdbcsqlite3-adapter'
   end
 
