@@ -54,7 +54,7 @@ module WebConsole
       config.web_console.tap do |c|
         # +Rails.root+ is not available while we set the default values of the
         # other options. Default it during initialization.
-        c.command = Rails.root.join('bin/rails console').to_s if c.command.blank?
+        c.command = 'rails console' if c.command.blank?
       end
     end
 
