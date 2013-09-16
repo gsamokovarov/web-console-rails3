@@ -21,7 +21,7 @@ To install it in your current application, add the following to your `Gemfile`.
 
 ```ruby
 group :development do
-  gem 'web-console-rails3', '~> 0.4.1'
+  gem 'web-console-rails3', '~> 1.0.0'
 end
 ```
 

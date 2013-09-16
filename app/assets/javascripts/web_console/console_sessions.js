@@ -5,16 +5,7 @@ var AJAXTransport = (function(WebConsole) {
   var inherits = WebConsole.inherits;
   var EventEmitter = WebConsole.EventEmitter;
 
-  // Use an IE friendly implementation of XMLHttpRequest.
-  XHR = (function() {
-    try {
-      return XMLHttpRequest;
-    } catch (e) {
-      return function() {
-        return new ActiveXObject('Microsoft.XMLHTTP');
-      };
-    }
-  }).call(this);
+  var FORM_MIME_TYPE = 'application/x-www-form-urlencoded; charset=utf-8';
 
   var AJAXTransport = function(options) {
     EventEmitter.call(this);
@@ -28,6 +19,13 @@ var AJAXTransport = (function(WebConsole) {
 
     this.pendingInput  = '';
 
+    this.initializeEventHandlers();
+  };
+
+  inherits(AJAXTransport, EventEmitter);
+
+  // Initializes the default event handlers.
+  AJAXTransport.prototype.initializeEventHandlers = function() {
     this.on('input', this.sendInput);
     this.on('configuration', this.sendConfiguration);
     this.once('initialization', function(cols, rows) {
@@ -36,13 +34,11 @@ var AJAXTransport = (function(WebConsole) {
     });
   };
 
-  inherits(AJAXTransport, EventEmitter);
-
   // Shorthand for creating XHR requests.
   AJAXTransport.prototype.createRequest = function(method, url, options) {
     options || (options = {});
 
-    var request = new XHR();
+    var request = new XMLHttpRequest;
     request.open(method, url);
 
     if (typeof options.form === 'object') {
@@ -53,8 +49,7 @@ var AJAXTransport = (function(WebConsole) {
         content.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
       }
 
-      var formMimeType = 'application/x-www-form-urlencoded; charset=utf-8';
-      request.setRequestHeader('Content-Type', formMimeType);
+      request.setRequestHeader('Content-Type', FORM_MIME_TYPE);
       request.data = content.join('&');
     }
 
@@ -66,7 +61,7 @@ var AJAXTransport = (function(WebConsole) {
 
     var self = this;
     request.onreadystatechange = function() {
-      if (request.readyState === 4) {
+      if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
           self.emit('pendingOutput', request.responseText);
           self.pollForPendingOutput();
@@ -103,7 +98,7 @@ var AJAXTransport = (function(WebConsole) {
 
     var self = this;
     request.onreadystatechange = function() {
-      if (request.readyState === 4) {
+      if (request.readyState === XMLHttpRequest.DONE) {
         self.sendingInput = false;
         if (self.pendingInput) self.sendInput();
       }

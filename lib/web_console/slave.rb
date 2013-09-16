@@ -10,6 +10,13 @@ module WebConsole
   # All of the communication is done in asynchrouns way, meaning that when you
   # send input to the process, you have get the output by polling for it.
   class Slave
+    # Different OS' and platforms raises different errors when trying to read
+    # on output end of a closed process.
+    READING_ON_CLOSED_END_ERRORS = [ Errno::EIO, EOFError ]
+
+    # Raised when trying to read from a closed (exited) process.
+    Closed = Class.new(IOError)
+
     # The slave process id.
     attr_reader :pid
 
@@ -54,14 +61,14 @@ module WebConsole
     # Gets the pending output of the process.
     #
     # The pending output is read in an non blocking way by chunks, in the size
-    # of +chunk_len+. By default, +chunk_len+ is 4096 bytes.
+    # of +chunk_len+. By default, +chunk_len+ is 49152 bytes.
     #
     # Returns +nil+, if there is no pending output at the moment. Otherwise,
     # returns the output that hasn't been read since the last invocation.
     #
     # Raises Errno:EIO on closed output stream. This can happen if the
     # underlying process exits.
-    def pending_output(chunk_len = 4096)
+    def pending_output(chunk_len = 49152)
       # Returns nil if there is no pending output.
       return unless pending_output?
 
@@ -72,6 +79,8 @@ module WebConsole
       pending.force_encoding('UTF-8')
     rescue IO::WaitReadable
       pending.force_encoding('UTF-8')
+    rescue
+      raise Closed if READING_ON_CLOSED_END_ERRORS.any? { |exc| $!.is_a?(exc) }
     end
 
     # Dispose the underlying process, sending +SIGTERM+.

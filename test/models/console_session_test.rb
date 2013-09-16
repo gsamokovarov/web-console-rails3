@@ -5,14 +5,14 @@ module WebConsole
     include ActiveModel::Lint::Tests
 
     setup do
-      PTY.stubs(:spawn).returns([String.new, String.new, Random.rand(20000)])
+      PTY.stubs(:spawn).returns([StringIO.new, StringIO.new, Random.rand(20000)])
       ConsoleSession::INMEMORY_STORAGE.clear
       @model1 = @model = ConsoleSession.new
       @model2 = ConsoleSession.new
     end
 
-    test 'raises ConsoleSession::NotFound on not found sessions' do
-      assert_raises(ConsoleSession::NotFound) { ConsoleSession.find(-1) }
+    test 'raises ConsoleSession::Unavailable on not found sessions' do
+      assert_raises(ConsoleSession::Unavailable) { ConsoleSession.find(-1) }
     end
 
     test 'find coerces ids' do
@@ -20,7 +20,7 @@ module WebConsole
     end
 
     test 'not found exceptions are json serializable' do
-      exception = assert_raises(ConsoleSession::NotFound) { ConsoleSession.find(-1) }
+      exception = assert_raises(ConsoleSession::Unavailable) { ConsoleSession.find(-1) }
       assert_equal '{"error":"Session unavailable"}', exception.to_json
     end
 
@@ -29,8 +29,14 @@ module WebConsole
       slave_methods.each { |method| assert @model.respond_to?(method) }
     end
 
+    test 'slave methods are cached on the singleton' do
+      assert_not @model.singleton_methods.include?(:pending_output?)
+      @model.pending_output? rescue nil
+      assert @model.singleton_methods.include?(:pending_output?)
+    end
+
     test 'persisted models knows that they are in memory' do
-      refute @model.persisted?
+      assert_not @model.persisted?
       @model.persist
       assert @model.persisted?
     end
@@ -46,7 +52,7 @@ module WebConsole
     end
 
     test 'no gives not persisted models' do
-      refute ConsoleSession.new.persisted?
+      assert_not ConsoleSession.new.persisted?
     end
   end
 end

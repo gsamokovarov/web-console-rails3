@@ -59,6 +59,8 @@ module Dummy
         'tango'
       elsif ENV['XTERM']
         'xterm'
+      elsif ENV['MONOKAI']
+        'monokai'
       else
         'light'
       end
