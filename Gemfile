@@ -3,6 +3,12 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
+  rails_version = %w( >=\ 3.2.0 <\ 4.0 )
+
+  # We need those for the testing application to run.
+  gem 'actionmailer', *rails_version
+  gem 'activerecord', *rails_version
+
   gem 'puma'
 
   # Only require this one explicitly.
