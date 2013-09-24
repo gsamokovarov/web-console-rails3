@@ -4,6 +4,7 @@ require 'rails/engine'
 
 # Those are required for Rails 3 compatibility.
 require 'strong_parameters'
+require 'active_model'
 require 'active_model/model'
 
 module WebConsole
