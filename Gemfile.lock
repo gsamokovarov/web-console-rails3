@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    web-console-rails3 (1.0.1)
+    web-console-rails3 (1.0.3)
       activemodel (>= 3.2.0, < 4.0)
       railties (>= 3.2.0, < 4.0)
       strong_parameters (~> 0.2.0)
@@ -9,12 +9,12 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionmailer (3.2.14)
-      actionpack (= 3.2.14)
+    actionmailer (3.2.15)
+      actionpack (= 3.2.15)
       mail (~> 2.5.4)
-    actionpack (3.2.14)
-      activemodel (= 3.2.14)
-      activesupport (= 3.2.14)
+    actionpack (3.2.15)
+      activemodel (= 3.2.15)
+      activesupport (= 3.2.15)
       builder (~> 3.0.0)
       erubis (~> 2.7.0)
       journey (~> 1.0.4)
@@ -22,15 +22,15 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
-    activemodel (3.2.14)
-      activesupport (= 3.2.14)
+    activemodel (3.2.15)
+      activesupport (= 3.2.15)
       builder (~> 3.0.0)
-    activerecord (3.2.14)
-      activemodel (= 3.2.14)
-      activesupport (= 3.2.14)
+    activerecord (3.2.15)
+      activemodel (= 3.2.15)
+      activesupport (= 3.2.15)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
-    activesupport (3.2.14)
+    activesupport (3.2.15)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
     arel (3.0.2)
@@ -42,7 +42,7 @@ GEM
     hike (1.2.3)
     i18n (0.6.5)
     journey (1.0.4)
-    json (1.8.0)
+    json (1.8.1)
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
@@ -51,7 +51,7 @@ GEM
     mime-types (1.25)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
-    multi_json (1.8.0)
+    multi_json (1.8.2)
     polyglot (0.3.3)
     pry (0.9.12.2)
       coderay (~> 1.0.5)
@@ -68,9 +68,9 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
-    railties (3.2.14)
-      actionpack (= 3.2.14)
-      activesupport (= 3.2.14)
+    railties (3.2.15)
+      actionpack (= 3.2.15)
+      activesupport (= 3.2.15)
       rack-ssl (~> 1.3.2)
       rake (>= 0.8.7)
       rdoc (~> 3.4)
@@ -102,7 +102,7 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
-    tzinfo (0.3.37)
+    tzinfo (0.3.38)
 
 PLATFORMS
   ruby

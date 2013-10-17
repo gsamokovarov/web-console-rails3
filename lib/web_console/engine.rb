@@ -3,9 +3,9 @@ require 'active_support/core_ext/numeric/time'
 require 'rails/engine'
 
 # Those are required for Rails 3 compatibility.
-require 'strong_parameters'
 require 'active_model'
 require 'active_model/model'
+require 'strong_parameters'
 
 module WebConsole
   class Engine < ::Rails::Engine
@@ -55,7 +55,13 @@ module WebConsole
       config.web_console.tap do |c|
         # +Rails.root+ is not available while we set the default values of the
         # other options. Default it during initialization.
-        c.command = 'rails console' if c.command.blank?
+
+        # Not all people created their Rails 4 applications with the Rails 4
+        # generator, so bin/rails may not be available.
+        if c.command.blank?
+          local_rails = Rails.root.join('bin/rails')
+          c.command = "#{local_rails.executable? ? local_rails : 'rails'} console"
+        end
       end
     end
 
